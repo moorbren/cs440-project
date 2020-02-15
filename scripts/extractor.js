@@ -6,7 +6,7 @@ var extractor = new Object();
 const axios = require("axios");
 async function requestURL(url, outputFunc){
     const result = await axios.get(url);
-    outputFunc(result);
+    outputFunc(result.data);
 }
 
 
