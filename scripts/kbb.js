@@ -4,12 +4,6 @@ const { JSDOM } = jsdom;
 var normalizer = require('./normalizer');
 var extractor = require('./extractor');
 
-var baseUrl = 'https://www.kbb.com/cars-for-sale/all/corvallis-or-97330?searchRadius=0&zip=97330&marketExtension=include&sortBy=relevance&numRecords=25';
-var counterParam = 'firstRecord';
-var maxCounter = 1000/25;
-var counterMult = 25;
-
-
 function parseData(responseText){
     var dom = new JSDOM(responseText);
     var document = dom.window.document;
@@ -20,7 +14,8 @@ function parseData(responseText){
         var carEl = carElements[x];
 
         var carObject = new Object();
-        try{ //if it can't even pass this, then skip this car
+        try{ //if it can't even past name and price then we can just skip it
+
             carObject.name = carEl.getElementsByTagName('h2')[0].textContent;
             carObject.price = normalizer.getNumbers(carEl.querySelector('.first-price').textContent);
             
@@ -40,6 +35,7 @@ function parseData(responseText){
 
                         if(elContent.includes(attribute)){
                             carObject[attribute] = elContent;
+                            //hidden subtext is always in the form: 'attribute: ', so we can just get rid of it
                             carObject[attribute] = carObject[attribute].replace(attribute + ': ', '');
 
                             break;
@@ -65,6 +61,11 @@ function parseData(responseText){
     return carObjects;
 }
 
+var baseUrl = 'https://www.kbb.com/cars-for-sale/all/corvallis-or-97330?searchRadius=0&zip=97330&marketExtension=include&sortBy=relevance&numRecords=25';
+var counterParam = 'firstRecord';
+var maxCounter = 1000/25;
+var counterMult = 25;
+var outFile = 'data/kbb.csv';
 
 //the extractor calls dump data after every 
-extractor.requestData(baseUrl, counterParam, maxCounter, counterMult, parseData, 'kbb.csv');
+extractor.requestData(baseUrl, counterParam, maxCounter, counterMult, parseData, outFile);

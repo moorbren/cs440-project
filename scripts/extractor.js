@@ -54,8 +54,9 @@ function objectArrToCSV(data = null, columnDelimiter = ",", lineDelimiter = "\n"
 		return null
 	}
 
-    var longestIndex = 0, biggestValue = 0;
-    for(var x = 0; x < Math.min(200, data.length); x++){
+    //added this bit to find a row with the most columns
+    var longestIndex = 0, biggestValue = 0; 
+    for(var x = 0; x < Math.min(1000, data.length); x++){
         if(Object.keys(data[x]).length > biggestValue){
             longestIndex = x; 
             biggestValue = Object.keys(data[x]).length;
