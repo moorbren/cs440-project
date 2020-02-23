@@ -63,17 +63,20 @@ function parseData(responseText){
 }
 
 var options = {
-    url: 'https://www.kbb.com/cars-for-sale/all/corvallis-or-97330?zip=97330&marketExtension=include&sortBy=relevance&numRecords=25',
+    url: 'https://www.kbb.com/cars-for-sale/all?marketExtension=include&sortBy=relevance&numRecords=25',
+    outputPath: 'data/kbb.csv',
+    scrapeData: parseData,
+
     counterParameter: 'firstRecord',
     numPages: 1000/25,
     counterMult: 25, 
-    outputPath: 'data/kbb.csv',
+    requestDelay: 600,
+
     zipcodes: true, 
     zipcodeParameter: 'zip',
     searchRadius: 50,
-    radiusParameter: 'searchRadius',
-    scrapeData: parseData,
-    requestDelay: 600
+    radiusParameter: 'searchRadius'
+    
 };
 
 extractor.requestDataFromQueryURL(options);
