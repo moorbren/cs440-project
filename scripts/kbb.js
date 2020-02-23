@@ -27,6 +27,7 @@ function parseData(responseText){
                 //attributes have a hidden subtext that describes what kind of data it stores
                 var carAttributes = listingBody.querySelectorAll('li');
                 var attributes = ["color", "mpg", "drive type", "engine"];
+                var columnNames = ["color", "mpg", "drive_type", "engine"];
 
                 carAttributes.forEach(function(element){
                     for(var x = 0; x < attributes.length; x++){
@@ -34,9 +35,9 @@ function parseData(responseText){
                         var elContent = element.textContent.toLowerCase()
 
                         if(elContent.includes(attribute)){
-                            carObject[attribute] = elContent;
+                            carObject[columnNames[x]] = elContent;
                             //hidden subtext is always in the form: 'attribute: ', so we can just get rid of it
-                            carObject[attribute] = carObject[attribute].replace(attribute + ': ', '');
+                            carObject[columnNames[x]] = carObject[columnNames[x]].replace(attribute + ': ', '');
 
                             break;
                         }
@@ -61,11 +62,18 @@ function parseData(responseText){
     return carObjects;
 }
 
-var baseUrl = 'https://www.kbb.com/cars-for-sale/all/corvallis-or-97330?searchRadius=0&zip=97330&marketExtension=include&sortBy=relevance&numRecords=25';
-var counterParam = 'firstRecord';
-var maxCounter = 1000/25;
-var counterMult = 25;
-var outFile = 'data/kbb.csv';
+var options = {
+    url: 'https://www.kbb.com/cars-for-sale/all/corvallis-or-97330?zip=97330&marketExtension=include&sortBy=relevance&numRecords=25',
+    counterParameter: 'firstRecord',
+    numPages: 1000/25,
+    counterMult: 25, 
+    outputPath: 'data/kbb.csv',
+    zipcodes: true, 
+    zipcodeParameter: 'zip',
+    searchRadius: 50,
+    radiusParameter: 'searchRadius',
+    scrapeData: parseData,
+    requestDelay: 600
+};
 
-//the extractor calls dump data after every 
-extractor.requestData(baseUrl, counterParam, maxCounter, counterMult, parseData, outFile);
+extractor.requestDataFromQueryURL(options);
