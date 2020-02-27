@@ -12,11 +12,11 @@ const axios = require("axios");
  * @param      {String} options.lineDelimiter   Line break, defaults to "\n"
  * @return     {String}                         CSV
  */
-function objectArrToCSV(data = null, columnDelimiter = ",", lineDelimiter = "\n") {
-	let result, ctr, keys
+function objectArrToCSV(data = null, columnDelimiter = ",", lineDelimiter = "\n", includeColumnTitles=false) {
+	let result, ctr, keys;
 
 	if (data === null || !data.length) {
-		return null
+		return null;
 	}
 
     //added this bit to find a row with the most columns
@@ -29,24 +29,32 @@ function objectArrToCSV(data = null, columnDelimiter = ",", lineDelimiter = "\n"
     }
     keys = Object.keys(data[longestIndex]);
 
-	result = ""
-	result += keys.join(columnDelimiter)
-	result += lineDelimiter
+    result = "";
+    if(includeColumnTitles){
+        result += keys.join(columnDelimiter);
+    }
 
-	data.forEach(item => {
-		ctr = 0
+	result += lineDelimiter;
+
+	for (var x = 0; x < data.length; x++){
+        var item = data[x];
+
+		ctr = 0;
 		keys.forEach(key => {
 			if (ctr > 0) {
-				result += columnDelimiter
+				result += columnDelimiter;
 			}
 
-			result += typeof item[key] === "string" && item[key].includes(columnDelimiter) ? `"${item[key]}"` : item[key]
-			ctr++
-		})
-		result += lineDelimiter
-	})
+			result += typeof item[key] === "string" && item[key].includes(columnDelimiter) ? `"${item[key]}"` : item[key];
+			ctr++;
+        });
+        
+        if(x+1 != data.length){
+            result += lineDelimiter;
+        }
+	}
 
-	return result
+	return result;
 }
 
 /**
@@ -60,9 +68,35 @@ async function dumpDataAsCSV(objectArray, filepath){
 
     fs.writeFile(filepath, textOut, function(err) {
         if(err) {
-            return console.log(err);
+            console.log(err);
+            return err;
+        }else{
+            console.log(objectArray.length + " rows saved at: " + filepath);
         }
-        console.log(objectArray.length + " rows saved at: " + filepath);
+    });    
+}
+
+async function dumpCars(cars, filepath){
+    var textOut = objectArrToCSV(cars); //converts the an object array to a row. 
+
+    fs.appendFile(filepath, textOut, function(err) {
+        if(err){
+            if(err.errno == -2) { //file doesn't exist
+                if(filepath.lastIndexOf('/') != -1){ //if the file includes a directory, we need to try to make them
+                    fs.mkdirSync(filepath.replace(filepath.slice(filepath.lastIndexOf('/')), "")); //creating directories excluding the filename
+                }
+
+                fs.writeFile(filepath, textOut, function(err) {
+                    if(err) {
+                        console.log('SEVERE ERROR: Unable to create output file. Please stop script.');
+                        return err;
+                    }
+                });
+            } else{
+                console.log(err);
+                return err;
+            }
+        }
     });    
 }
 
@@ -79,41 +113,49 @@ var completionTable = new Object(); //stores the progress of the requests curren
  */
 async function requestURL(url, options){
     var err = false;
-    //waiting for the page to be downloaded.
-    const result = await axios.get(url).catch(function(error){
-        if(error.response){
-            console.log('Failed loading page.');
-            completionTable[options.outputPath].completed += 1;
 
+    //waiting for the page to be downloaded.
+    const result = await axios.get(url).catch(function(error){ 
+        if(error){
+            completionTable[options.outputPath].completed += 1;
             err = true;
+
+            var x = completionTable[options.outputPath].completed;
+            if(options.zipcodes){
+                console.log(`FAILED request ${x}/${options.numPages*options._numzips}: ` + ((x/(options.numPages *  options._numzips))*100).toFixed(2) + '%'); //printing progress
+            }else{
+                console.log(`FAILED request ${x}/${options.numPages}: ` + ((x/options.numPages)*100).toFixed(2) + '%'); //printing progress
+            }
         }
     }); 
+    //if a page COMPLETELY fails to load, that is an issue on their end. 
+    //We only want to skip results if there are no cars on a successful page load.
+    if(err){ return true;} 
+   
 
-    if(err){ return;}
+
+    var objs = options.scrapeData(result.data, options.columns); //getting array of all cars on this page. 
+    completionTable[options.outputPath].totalObjects += objs.length; //appending the cars from this page to the complete set. 
+    
 
     completionTable[options.outputPath].completed += 1; //page is downloaded, storing it. 
-
-    var objs = options.scrapeData(result.data); //getting array of all cars on this page. 
-    completionTable[options.outputPath].objects = completionTable[options.outputPath].objects.concat(objs); //appending the cars from this page to the complete set. 
-
     var x = completionTable[options.outputPath].completed;
+
     if(options.zipcodes){
-        console.log(`Completed request ${x}/${options.numPages*options._numzips}: ` + ((x/(options.numPages *  options._numzips))*100).toFixed(2) + '%'); //printing progress
-
-        if(x == options.numPages * options._numzips){
-            dumpDataAsCSV(completionTable[options.outputPath].objects, options.outputPath); //saving data. 
-            completionTable[options.outputPath] = undefined; //this data is saved to disk, now we can remove it. 
-            console.log('Download complete!');
-        }
-
+        console.log(`Completed request ${x}/${options.numPages*options._numzips}: ` + ((x/(options.numPages *  options._numzips))*100).toFixed(2) + '%'+
+            " | TotalCars:" + completionTable[options.outputPath].totalObjects); //printing progress
     }else{
-        console.log(`Completed request ${x}/${options.numPages}: ` + ((x/options.numPages)*100).toFixed(2) + '%'); //printing progress
+        console.log(`Completed request ${x}/${options.numPages}: ` + ((x/options.numPages)*100).toFixed(2) + '%'+
+            " | TotalCars:" + completionTable[options.outputPath].totalObjects); //printing progress
+    }
 
-        if(x == options.numPages){ //if all requests are complete
-            dumpDataAsCSV(completionTable[options.outputPath].objects, options.outputPath); //saving data. 
-            completionTable[options.outputPath] = undefined; //this data is saved to disk, now we can remove it. 
-            console.log('Download complete!');
-        }
+    dumpCars(objs, options.outputPath); //saving this batch of cars to the output in case there is a fault
+
+    if(objs.length > 0){
+
+        return true;
+    }else{
+        return false;
     }
 }
 
@@ -196,8 +238,9 @@ function sleep(ms) {
  * 
  */
 async function requestDataFromQueryURL(options){
-    completionTable[options.outputPath] = {completed: 0, objects: new Array()};
+    completionTable[options.outputPath] = {completed: 0, totalObjects: 0};
     console.log('Beginning scrape process...');
+    console.log("Results will be appended to '" + options.outputPath + "'.\n");
 
     if(options.zipcodes){
         
@@ -212,17 +255,16 @@ async function requestDataFromQueryURL(options){
 
         for(var x = 0; x < reducedZipcodes.length; x++){
             var customURL = options.url + '&' +  options.zipcodeParameter + '=' + reducedZipcodes[x] + '&' +  options.radiusParameter + '=' + options.searchRadius;
-
-            await sleep(options.requestDelay);
             _requestLoop(customURL, options);
+            await sleep(options.requestDelay);
         }
 
     }else{
         console.log('This should take about ' + ((options.requestDelay * options.numPages)/(1000*60)).toFixed(1) + ' minutes.\n')
-        await sleep(options.requestDelay);
-        _requestLoop(options.url, options);
+        await _requestLoop(options.url, options);
     }
     
+    console.log("Process is complete. Results saved to '" + options.outputPath + "'");
 }
 
 
@@ -235,9 +277,16 @@ async function requestDataFromQueryURL(options){
 async function _requestLoop(url, options){
     for(var x = 0; x < options.numPages; x++){
         var newUrl = url + '&' + options.counterParameter + '=' + (x * options.counterMult);
+        
+        var pretime = new Date();
+        var requestResult = await requestURL(newUrl, options); //this returns true if request succeeds, false otherwise
+        var waitMS = Math.max(options.requestDelay - (new Date().getTime() - pretime.getTime()), 0); //subtracts time it took to request the URL against the request delay.
 
-        await sleep(options.requestDelay);
-        requestURL(newUrl, options);
+        if(!requestResult){//if request failed.
+            completionTable[options.outputPath].completed += options.numPages - (x+1); //ensuring the skipped requests are counted. 
+            return;
+        }
+        await sleep(waitMS);
     }
 }
 

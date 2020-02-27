@@ -30,6 +30,22 @@ function isCarColor(string){
     return false;
 }
 
+/**
+ * Creates a car object based on the array of attributes given. 
+ * EX. ['color', 'mileage', ...] --> car.color == undefined, car.mileage == undefined, ...
+ * 
+ * @param {Array<string>} attributes 
+ */
+function initCar(attributes){
+    var car = new Object();
+    attributes.forEach(function(attribute){
+        car[attribute] = undefined;
+    });
+
+    return car;
+}
+
+normalizer.initCar = initCar;
 normalizer.getNumbers = getNumbers;
 normalizer.isCarColor = isCarColor;
 
