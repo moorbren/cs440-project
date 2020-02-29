@@ -213,6 +213,9 @@ function getReducedZipcodes(searchRadius){
     options.counterParameter    - {string}      The query parameter that represents what records are being shown. 
                                                 (what page # or how many cars have been offset) ex. page (from above example)
 
+    options.columns             - {Array}       IMPORTANT: A list of all data values you will be scraping for each car. EX. ['name', 'price', ...].
+                                                If this isn't set properly, the data saved to the CSV will be broken. 
+
     options.numPages            - {number}      How many pages should be requested. Inputting '40' would request 40 pages.
     options.counterMult         - {number}      The counterParameter will combined with the counter to request the pages. This is a constant that is multiplied with the counter.
     options.scrapeData          - {function}    The function that scrapes the cars from the page and returns an array of car objects (see kbb.js's parse data function.)

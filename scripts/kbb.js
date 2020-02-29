@@ -85,9 +85,8 @@ var options = {
 
     zipcodes: true, 
     zipcodeParameter: 'zip',
-    searchRadius: 50,
+    searchRadius: 45,
     radiusParameter: 'searchRadius'
-    
 };
 
 extractor.requestDataFromQueryURL(options);
