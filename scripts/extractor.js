@@ -2,7 +2,8 @@ var fs = require('fs');
 var zipcodes = require('zipcodes');
 var extractor = new Object();
 const axios = require("axios");
-
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 /**
  * Take an array of objects of similar structure and convert it to a CSV.
  * @source     https://halistechnology.com/2015/05/28/use-javascript-to-export-your-data-as-csv/
@@ -109,20 +110,27 @@ var completionTable = new Object(); //stores the progress of the requests curren
  * Once all requests have been loaded, it outputs it the requested path. 
  * 
  * @param {*} url 
- * @param {*} optinos
+ * @param {*} options
  */
-async function requestURL(url, options){
+var page = 0;
+var zip = undefined;
+async function requestURL(url, options, currentZip, page){
     var err = false;
+    var cookie = "EdmundsYear=zip=" + currentZip + ";"; 
 
     //waiting for the page to be downloaded.
-    const result = await axios.get(url).catch(function(error){ 
+    const result = await axios.get(url, {
+                                    headers: {
+                                        Cookie: cookie
+                                    }
+                                        }).catch(function(error){ 
         if(error){
             completionTable[options.outputPath].completed += 1;
             err = true;
-
             var x = completionTable[options.outputPath].completed;
             if(options.zipcodes){
-                console.log(`FAILED request ${x}/${options.numPages*options._numzips}: ` + ((x/(options.numPages *  options._numzips))*100).toFixed(2) + '%'); //printing progress
+                // console.log(url);
+                console.log(`FAILED request ${x}/${options.numPages*options._numzips}: ` + ((x/(options.numPages *  options._numzips))*100).toFixed(2) + '%' + '\t| pagenum: ' + page + '\t| zip: ' + currentZip); //printing progress
             }else{
                 console.log(`FAILED request ${x}/${options.numPages}: ` + ((x/options.numPages)*100).toFixed(2) + '%'); //printing progress
             }
@@ -130,8 +138,10 @@ async function requestURL(url, options){
     }); 
     //if a page COMPLETELY fails to load, that is an issue on their end. 
     //We only want to skip results if there are no cars on a successful page load.
-    if(err){ return true;} 
-   
+    if(err){ return true;}
+    // var dom = new JSDOM(result.data);
+    // var document = dom.window.document;
+    // createCookie("EdmundsYear", "zip=" + currentZip, 1, document);
 
 
     var objs = options.scrapeData(result.data, options.columns); //getting array of all cars on this page. 
@@ -142,11 +152,12 @@ async function requestURL(url, options){
     var x = completionTable[options.outputPath].completed;
 
     if(options.zipcodes){
+        // console.log(url);
         console.log(`Completed request ${x}/${options.numPages*options._numzips}: ` + ((x/(options.numPages *  options._numzips))*100).toFixed(2) + '%'+
-            " | TotalCars:" + completionTable[options.outputPath].totalObjects); //printing progress
+            " | TotalCars: " + completionTable[options.outputPath].totalObjects + '\t| pagenum: ' + page + '\t| zip: ' + currentZip); //printing progress
     }else{
         console.log(`Completed request ${x}/${options.numPages}: ` + ((x/options.numPages)*100).toFixed(2) + '%'+
-            " | TotalCars:" + completionTable[options.outputPath].totalObjects); //printing progress
+            " | TotalCars: " + completionTable[options.outputPath].totalObjects); //printing progress
     }
 
     dumpCars(objs, options.outputPath); //saving this batch of cars to the output in case there is a fault
@@ -205,7 +216,7 @@ function getReducedZipcodes(searchRadius){
 /*
     REQUEST DATA FROM QUERY BASED URL
     ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-    See kbb.js for an example. 
+    See edmunds.js for an example. 
 
     options     - {object} A javascript object that contains crucial configuration details specific to the targeted website. 
 
@@ -218,7 +229,7 @@ function getReducedZipcodes(searchRadius){
 
     options.numPages            - {number}      How many pages should be requested. Inputting '40' would request 40 pages.
     options.counterMult         - {number}      The counterParameter will combined with the counter to request the pages. This is a constant that is multiplied with the counter.
-    options.scrapeData          - {function}    The function that scrapes the cars from the page and returns an array of car objects (see kbb.js's parse data function.)
+    options.scrapeData          - {function}    The function that scrapes the cars from the page and returns an array of car objects (see edmunds.js's parse data function.)
     options.outputPath          - {string}      Path of the file to output the data to. Please make this unique (just name it after the domain name). EX. 'data/cargurus.csv'
     options.requestDelay        - {number}      Delay (ms) between sending each request to the website. IN milliseconds.
 
@@ -255,10 +266,12 @@ async function requestDataFromQueryURL(options){
         console.log('This should take about ' + ((options.requestDelay * options.numPages * reducedZipcodes.length)/(1000*60)).toFixed(1) + ' minutes.\n')
 
         options._numzips = reducedZipcodes.length; //needed to display meaningful progress since there are a lot of zipcodes.
+        //we have to use a cookie to change the zip for edmunds.com
 
         for(var x = 0; x < reducedZipcodes.length; x++){
-            var customURL = options.url + '&' +  options.zipcodeParameter + '=' + reducedZipcodes[x] + '&' +  options.radiusParameter + '=' + options.searchRadius;
-            _requestLoop(customURL, options);
+            var customURL = options.url + '&' +  options.radiusParameter + '=' + options.searchRadius;
+            var currentZip = reducedZipcodes[x];
+            _requestLoop(customURL, options, currentZip);
             await sleep(options.requestDelay);
         }
 
@@ -270,6 +283,16 @@ async function requestDataFromQueryURL(options){
     console.log("Process is complete. Results saved to '" + options.outputPath + "'");
 }
 
+function createCookie(name,value,days,document) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 *1000));
+        var expires = "; expires=" + date.toGMTString();
+    } else {
+        var expires = "";
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
 
 /**
  * Loops through the given URL base. 
@@ -277,12 +300,12 @@ async function requestDataFromQueryURL(options){
  * @param {*} url 
  * @param {*} options 
  */
-async function _requestLoop(url, options){
-    for(var x = 0; x < options.numPages; x++){
-        var newUrl = url + '&' + options.counterParameter + '=' + (x * options.counterMult);
-        
+async function _requestLoop(url, options, currentZip){
+    for(var x = 1; x < options.numPages; x++){
+        var newUrl = url + '&' + options.counterParameter + '=' + (x);
+        // console.log(newUrl + '&zip=' + currentZip);
         var pretime = new Date();
-        var requestResult = await requestURL(newUrl, options); //this returns true if request succeeds, false otherwise
+        var requestResult = await requestURL(newUrl, options, currentZip, x); //this returns true if request succeeds, false otherwise
         var waitMS = Math.max(options.requestDelay - (new Date().getTime() - pretime.getTime()), 0); //subtracts time it took to request the URL against the request delay.
 
         if(!requestResult){//if request failed.
