@@ -119,11 +119,7 @@ async function requestURL(url, options, currentZip, page){
     var cookie = "EdmundsYear=zip=" + currentZip + ";"; 
 
     //waiting for the page to be downloaded.
-    const result = await axios.get(url, {
-                                    headers: {
-                                        Cookie: cookie
-                                    }
-                                        }).catch(function(error){ 
+    const result = await axios.get(url).catch(function(error){ 
         if(error){
             completionTable[options.outputPath].completed += 1;
             err = true;
@@ -269,7 +265,7 @@ async function requestDataFromQueryURL(options){
         //we have to use a cookie to change the zip for edmunds.com
 
         for(var x = 0; x < reducedZipcodes.length; x++){
-            var customURL = options.url + '&' +  options.radiusParameter + '=' + options.searchRadius;
+            var customURL = options.url + '&' +  options.radiusParameter + '=' + options.searchRadius + '&' + options.zipcodeParameter + '=' + reducedZipcodes[x];
             var currentZip = reducedZipcodes[x];
             _requestLoop(customURL, options, currentZip);
             await sleep(options.requestDelay);
@@ -302,7 +298,7 @@ function createCookie(name,value,days,document) {
  */
 async function _requestLoop(url, options, currentZip){
     for(var x = 1; x < options.numPages; x++){
-        var newUrl = url + '&' + options.counterParameter + '=' + (x);
+        var newUrl = url + '#' + options.counterParameter + '=' + (x);
         // console.log(newUrl + '&zip=' + currentZip);
         var pretime = new Date();
         var requestResult = await requestURL(newUrl, options, currentZip, x); //this returns true if request succeeds, false otherwise
