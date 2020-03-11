@@ -226,7 +226,7 @@ function getReducedZipcodes(searchRadius){
     options.numPages            - {number}      How many pages should be requested. Inputting '40' would request 40 pages.
     options.counterMult         - {number}      The counterParameter will combined with the counter to request the pages. This is a constant that is multiplied with the counter.
     options.scrapeData          - {function}    The function that scrapes the cars from the page and returns an array of car objects (see edmunds.js's parse data function.)
-    options.outputPath          - {string}      Path of the file to output the data to. Please make this unique (just name it after the domain name). EX. 'data/cargurus.csv'
+    options.outputPath          - {string}      Path of the file to output the data to. Please make this unique (just name it after the domain name). EX. 'data/cars.csv'
     options.requestDelay        - {number}      Delay (ms) between sending each request to the website. IN milliseconds.
 
     [These 4 are only needed if zipcodes==true]
