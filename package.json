@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
+  "scripts": {	  
+    "autotrader": "node ./scripts/autotrader.js",
+    "truecar": "node ./scripts/truecar.js",
     "kbb": "node ./scripts/kbb.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

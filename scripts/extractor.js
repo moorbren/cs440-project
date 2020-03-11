@@ -152,7 +152,6 @@ async function requestURL(url, options){
     dumpCars(objs, options.outputPath); //saving this batch of cars to the output in case there is a fault
 
     if(objs.length > 0){
-
         return true;
     }else{
         return false;
@@ -246,8 +245,6 @@ async function requestDataFromQueryURL(options){
     console.log("Results will be appended to '" + options.outputPath + "'.\n");
 
     if(options.zipcodes){
-        
-
         console.log('Generating reduced zip codes...');
         var reducedZipcodes = getReducedZipcodes(options.searchRadius);
         console.log('Using ' + reducedZipcodes.length + ' zipcodes of about 41689. Reduced # of zip codes by ' + ((1 - (reducedZipcodes.length/41689))*100).toFixed(2) + '%.');
@@ -257,7 +254,10 @@ async function requestDataFromQueryURL(options){
         options._numzips = reducedZipcodes.length; //needed to display meaningful progress since there are a lot of zipcodes.
 
         for(var x = 0; x < reducedZipcodes.length; x++){
-            var customURL = options.url + '&' +  options.zipcodeParameter + '=' + reducedZipcodes[x] + '&' +  options.radiusParameter + '=' + options.searchRadius;
+            var zipInfo = zipcodes.lookup(reducedZipcodes[x]);
+            var zipUrlSegment = zipInfo.city.toLowerCase().replace(' ', '-') + '-' + zipInfo.state.toLowerCase() + '/?';
+
+            var customURL = options.url + zipUrlSegment + options.radiusParameter + '=' + options.searchRadius;
             _requestLoop(customURL, options);
             await sleep(options.requestDelay);
         }
