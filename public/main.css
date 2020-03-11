@@ -1,0 +1,104 @@
+body{
+    margin: 0;
+}
+
+#navbar{
+    border-top: 4px rgb(45, 23, 68) solid;
+    border-bottom: 4px rgb(45, 23, 68) solid;
+
+
+    display: block;
+    position: relative;
+    top:0px;
+
+    height: 60px;    
+    z-index: 100;
+    font-family: "Montserrat" ,-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+    background: darkmagenta;
+}
+
+.navbar-item { 
+    filter: none;
+    display: block;
+    float: left;
+
+    font-size: 20px;
+    margin: 0 auto;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 30px;
+
+    color: white;
+    text-shadow: 0px 0px 4px black;
+}
+
+.navbar-item > p {
+    display: inline-block;
+    color: rgb(189, 189, 189);
+}
+
+#home {
+    margin-left: 200px;
+}
+
+#logo {
+    
+    /* filter: brightness(320%); */
+    user-select: none;
+    background: rgb(1, 1, 1, 0.2);
+    padding: 0px 10px;
+
+    border: 1px lightgray;
+    border-radius: 10px;
+
+    text-shadow: 0px 0px 4px white;
+    font-size: 40px;
+    font-family: 'Gruppo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: white;
+}
+
+#account-button{
+    float: right;
+    margin-right: 30px;
+}
+
+
+#content-container {
+    overflow: hidden;
+    font-family:  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+    min-height: 100px;
+    background: white;
+    padding: 30px;
+
+}
+
+
+.sc-icon-container {
+    /* height: 100%; */
+    display: inline-block;
+    width: 18px;
+    margin-right: 0.4em;
+}
+
+.sc-svg {
+    display: block;
+    margin: auto;
+    height: 16px;
+    max-width: 20px;
+
+    font-style:normal;
+    font-weight:normal;
+    font-variant:normal;
+
+    text-transform:none;
+    line-height:1;
+    
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+}
+
