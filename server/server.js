@@ -70,11 +70,17 @@
     var query = ` SELECT AVG(year) as year_avg, 
                          AVG(mileage) as mileage_avg,
                          AVG(price) as price_avg
-                  FROM ALL_CARS;` //this should return nothing for now
+                  FROM ALL_CARS;`
+    // var query = ` SELECT AVG(year) as year_avg, 
+    //     FROM ALL_CARS;
+    //     WHERE year < 2021 && year > 1950`
     req.db.query(query, function(err, results){
       if(err) return;
       db.close(req);
       console.log(results);
+      results[0].year_avg = Math.floor(results[0].year_avg);
+      results[0].mileage_avg = Math.floor(results[0].mileage_avg);
+      results[0].price_avg = results[0].price_avg.toFixed(2);
       res.render('home', {results: results[0]});
     })
   
