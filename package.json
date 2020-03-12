@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./server/server.js",
+    "normalize": "node --max-old-space-size=8192 ./scripts/normalize-all.js",
     "kbb": "node ./scripts/kbb.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

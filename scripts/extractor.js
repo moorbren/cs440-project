@@ -297,5 +297,6 @@ async function _requestLoop(url, options){
 
 extractor.dumpDataAsCSV = dumpDataAsCSV;
 extractor.requestDataFromQueryURL = requestDataFromQueryURL;
+extractor.dumpCars = dumpCars;
 
 module.exports = extractor;
