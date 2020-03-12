@@ -1,7 +1,7 @@
 # cs440-project
 
-KBB.com: Run using 'npm run kbb'
-
+  KBB.com:  'npm run kbb'
+Normalize:  'npm run normalize'
 
 ## Main normalizer (scripts/normalize-all.js)
 This combines all the data files listed in data/ into a single file and performs some final update operations. 
