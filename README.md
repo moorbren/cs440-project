@@ -1,6 +1,7 @@
 # cs440-project
 
-  KBB.com:  'npm run kbb'
+KBB.com:  'npm run kbb'
+
 Normalize:  'npm run normalize'
 
 ## Main normalizer (scripts/normalize-all.js)
