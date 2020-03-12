@@ -67,12 +67,15 @@
    * exposes it as `req.db`.
    */
   app.get('/', db.connectDb, function(req, res) {
-    var query = ` SELECT name FROM ALL_CARS
-                  WHERE name = "123"` //this should return nothing for now
+    var query = ` SELECT AVG(year) as year_avg, 
+                         AVG(mileage) as mileage_avg,
+                         AVG(price) as price_avg
+                  FROM ALL_CARS;` //this should return nothing for now
     req.db.query(query, function(err, results){
       if(err) return;
       db.close(req);
-      res.render('home', {results: results});
+      console.log(results);
+      res.render('home', {results: results[0]});
     })
   
     db.close(req);
