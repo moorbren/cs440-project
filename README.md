@@ -1,14 +1,20 @@
 # cs440-project
 
 ## Install/Setup
+
 Install NodeJS
+
 $git clone thisrepoURL
+
 From project root folder:
+
 $npm install
 
 ## Website (server/server.js)
 From the project root folder:
+
 $npm start
+
 Navigate to localhost:39761
 
 ## Uploader (scripts/kbb.js)
@@ -29,5 +35,6 @@ What we used to upload our data since the GUI got stuck about ~500000 rows in
 
 ## Initial Normalizer (normalization/edmunds.py, normalization/cars.py, normalization/cargurus.py)
 These were used to take the edmunds, cars.com, and cargurus.com data and remove uneccessary columns and split strings to make new columns.
+
 $ python filename
 
