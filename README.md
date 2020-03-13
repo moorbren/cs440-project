@@ -41,5 +41,5 @@ What we used to upload our data since the GUI got stuck about ~500000 rows in
 ## Initial Normalizer (normalization/edmunds.py, normalization/cars.py, normalization/cargurus.py)
 These were used to take the edmunds, cars.com, and cargurus.com data and remove uneccessary columns and split strings to make new columns.
 
-$ python filename
+$ python 'pathToFile + filename'
 
