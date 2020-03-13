@@ -1,5 +1,11 @@
 # cs440-project
 
+## Uploader (scripts/kbb.js)
+
+
+## Uploader (scripts/kbb.js)
+We also have other branches for some of the other scrapers we used on other sites. You can run these in a similar way, just change the kbb in the run command to the name of the new script. (Note, cargurus.js in cargurus branch got lost, so there is no way to replicate the code. It used very similar methods as the other scrapers.)
+
 KBB.com:  'npm run kbb'
 
 Normalize:  'npm run normalize'
@@ -12,4 +18,8 @@ Each file should indicate which columns are which in the first line and special 
   
 ## Uploader (scripts/uploader.js)
 What we used to upload our data since the GUI got stuck about ~500000 rows in
+
+## Initial Normalizer (normalization/edmunds.py, normalization/cars.py, normalization/cargurus.py)
+These were used to take the edmunds, cars.com, and cargurus.com data and remove uneccessary columns and split strings to make new columns.
+$ python filename
 
