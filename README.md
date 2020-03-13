@@ -1,7 +1,15 @@
 # cs440-project
 
-## Uploader (scripts/kbb.js)
+## Install/Setup
+Install NodeJS
+$git clone thisrepoURL
+From project root folder:
+$npm install
 
+## Website (server/server.js)
+From the project root folder:
+$npm start
+Navigate to localhost:39761
 
 ## Uploader (scripts/kbb.js)
 We also have other branches for some of the other scrapers we used on other sites. You can run these in a similar way, just change the kbb in the run command to the name of the new script. (Note, cargurus.js in cargurus branch got lost, so there is no way to replicate the code. It used very similar methods as the other scrapers.)
