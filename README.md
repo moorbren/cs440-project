@@ -20,6 +20,8 @@ Navigate to localhost:39761
 ## Uploader (scripts/kbb.js)
 We also have other branches for some of the other scrapers we used on other sites. You can run these in a similar way, just change the kbb in the run command to the name of the new script. (Note, cargurus.js in cargurus branch got lost, so there is no way to replicate the code. It used very similar methods as the other scrapers.)
 
+From the project root folder:
+
 KBB.com:  $npm run kbb
 
 ## Main normalizer (scripts/normalize-all.js)
@@ -28,6 +30,8 @@ Each file should indicate which columns are which in the first line and special 
 
   EX: Labeling a column 'mileage_km' will convert it to miles and then set mileage based on what the converted value is. 
   
+From the project root folder:
+
 Normalize:  $npm run normalize
  
   
