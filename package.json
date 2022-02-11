@@ -14,7 +14,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "express": "^4.17.1",
-    "express-handlebars": "^3.1.0",
+    "express-handlebars": "^5.3.1",
     "jsdom": "^12",
     "mysql": "^2.18.1",
     "xmlhttprequest": "^1.8.0",
