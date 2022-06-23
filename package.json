@@ -15,7 +15,7 @@
     "axios": "^0.19.2",
     "express": "^4.17.1",
     "express-handlebars": "^3.1.0",
-    "jsdom": "^12",
+    "jsdom": "^16",
     "mysql": "^2.18.1",
     "xmlhttprequest": "^1.8.0",
     "zipcodes": "^8.0.0"
